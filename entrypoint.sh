@@ -23,8 +23,14 @@ fi
 # Apply the 'api-keys' environment variable.
 # Accepts a comma-separated or newline-separated list of keys.
 # Example Railway env var value: "sk-key1,sk-key2,sk-key3"
-if [ -n "${api_keys:-}" ] || [ -n "${API_KEYS:-}" ]; then
-  RAW_KEYS="${api_keys:-${API_KEYS}}"
+#
+# The Railway environment variable is named 'api-keys' (with a hyphen).
+# Shell syntax like ${api-keys} is invalid (hyphen is a special operator),
+# so we use printenv to read it, then fall back to api_keys / API_KEYS for
+# compatibility with other deployment environments.
+_HYPHEN_KEYS="$(printenv 'api-keys' 2>/dev/null || true)"
+if [ -n "$_HYPHEN_KEYS" ] || [ -n "${api_keys:-}" ] || [ -n "${API_KEYS:-}" ]; then
+  RAW_KEYS="${_HYPHEN_KEYS:-${api_keys:-${API_KEYS}}}"
   echo "[entrypoint] Applying api-keys from environment variable"
 
   # Build a YAML sequence from the comma/newline-separated key list.
