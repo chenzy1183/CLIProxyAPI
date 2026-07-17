@@ -492,6 +492,21 @@ func main() {
 		cfg = &config.Config{}
 	}
 
+	// Override api-keys from the environment variable if set.
+	// This allows Railway (and other platforms) to inject API keys without editing the config file.
+	if value, ok := lookupEnv("api-keys", "API_KEYS"); ok {
+		var envAPIKeys []string
+		for _, key := range strings.Split(value, ",") {
+			if trimmed := strings.TrimSpace(key); trimmed != "" {
+				envAPIKeys = append(envAPIKeys, trimmed)
+			}
+		}
+		if len(envAPIKeys) > 0 {
+			cfg.APIKeys = envAPIKeys
+			log.Infof("api-keys overridden from environment variable (%d key(s) configured)", len(envAPIKeys))
+		}
+	}
+
 	// In cloud deploy mode, check if we have a valid configuration
 	var configFileExists bool
 	if isCloudDeploy {
