@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends tzdata ca-certi
 
 RUN mkdir /CLIProxyAPI
 
-COPY --from=builder ./app/CLIProxyAPI /CLIProxyAPI/CLIProxyAPI
+COPY --from=builder /app/CLIProxyAPI /CLIProxyAPI/CLIProxyAPI
 
 COPY config.example.yaml /CLIProxyAPI/config.example.yaml
 
